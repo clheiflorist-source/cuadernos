@@ -26,7 +26,7 @@ type Pagina =
   | { tipo: "entrega" }
   | { tipo: "final" };
 
-const ROMANOS = ["I", "II", "III", "IV", "V", "VI", "VII"];
+const ROMANOS = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
 
 /* ============ Área de respuesta (escritura libre) ============ */
 
