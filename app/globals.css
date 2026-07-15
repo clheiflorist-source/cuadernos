@@ -73,6 +73,12 @@
   --color-line: #e5dfd3;
   --color-line-gold: #d9c9a8;
 
+  /* Edición v2 (experimento DÁNGO): encuadernación nocturna */
+  --color-night: #211d17;
+  --color-night-soft: #2a2620;
+  --color-ivory: #f1ece1;
+  --color-champagne: #d8c39a;
+
   --font-display: "Cinzel", Georgia, serif;
   --font-editorial: "Cormorant Garamond", Georgia, serif;
   --font-body: "Jost", "Segoe UI", system-ui, sans-serif;
@@ -310,4 +316,54 @@ html:not(.js) .brand-loader {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ============ Edición v2 (experimento DÁNGO) ============ */
+/* Estampado de oro: el título de portada como foil sobre la encuadernación. */
+.v2-foil {
+  background: linear-gradient(
+    112deg,
+    #8f7454 0%,
+    #c1a875 30%,
+    #ecdcb4 50%,
+    #c1a875 70%,
+    #8f7454 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Capitular de las cartas: la primera letra en Cormorant itálica oro. */
+.v2-dropcap::first-letter {
+  float: left;
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 3.2em;
+  line-height: 0.8;
+  padding: 0.06em 0.12em 0 0;
+  color: var(--color-gold-deep);
+}
+
+/* Hilo de avance con destello de champaña, lento como luz sobre foil. */
+@keyframes v2-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+.v2-thread {
+  background: linear-gradient(
+    90deg,
+    var(--color-gold-deep) 0%,
+    var(--color-champagne) 45%,
+    #ecdcb4 50%,
+    var(--color-champagne) 55%,
+    var(--color-gold-deep) 100%
+  );
+  background-size: 200% 100%;
+  animation: v2-shimmer 7s linear infinite;
 }
