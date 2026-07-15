@@ -24,7 +24,7 @@ const SLOTS = [
   { x: 20, y: 70, r: -16 },
   { x: 82, y: 64, r: 24 },
   { x: 16, y: 24, r: -6 },
-  { x: 68, y: 44, r: 14 },
+  { x: 81, y: 42, r: 14 },
 ];
 
 export default function Ambiente({ pagina }: { pagina: number }) {
