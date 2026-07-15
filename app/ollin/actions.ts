@@ -1,7 +1,7 @@
 "use server";
 
 /**
- * Acciones de servidor del cuaderno Yolotzin. La lógica (correo, respaldo y
+ * Acciones de servidor del cuaderno OLLIN. La lógica (correo, respaldo y
  * continuidad) vive en lib/entrega.ts; aquí solo se enlaza con el contenido
  * de este cuaderno.
  */

@@ -9,7 +9,7 @@ import {
   sincronizarBorrador,
 } from "./actions";
 
-/** Yolotzin · Bodas Íntimas. El diseño vive en components/CuadernoUI. */
+/** OLLIN · Wedding Planner Integral. El diseño vive en components/CuadernoUI. */
 export default function Cuaderno({
   continuidadDisponible,
 }: {

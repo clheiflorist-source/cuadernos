@@ -39,7 +39,12 @@ async function comando(cmd: (string | number)[]): Promise<unknown> {
   return datos.result;
 }
 
-const clave = (token: string) => `cuaderno:yolotzin:${token}`;
+/**
+ * Cada cuaderno guarda sus borradores bajo su propio namespace. El valor por
+ * omisión "yolotzin" preserva las claves de los borradores que ya existen en
+ * producción; cuadernos nuevos (p. ej. "ollin") pasan su propio slug.
+ */
+const clave = (token: string, ns = "yolotzin") => `cuaderno:${ns}:${token}`;
 
 export type Borrador = {
   nombres: string;
@@ -53,11 +58,12 @@ export type Borrador = {
 export async function guardarBorrador(
   token: string,
   borrador: Borrador,
+  ns?: string,
 ): Promise<boolean> {
   try {
     await comando([
       "SET",
-      clave(token),
+      clave(token, ns),
       JSON.stringify(borrador),
       "EX",
       TTL_SEGUNDOS,
@@ -69,9 +75,12 @@ export async function guardarBorrador(
   }
 }
 
-export async function leerBorrador(token: string): Promise<Borrador | null> {
+export async function leerBorrador(
+  token: string,
+  ns?: string,
+): Promise<Borrador | null> {
   try {
-    const crudo = await comando(["GET", clave(token)]);
+    const crudo = await comando(["GET", clave(token, ns)]);
     if (typeof crudo !== "string") return null;
     return JSON.parse(crudo) as Borrador;
   } catch (e) {

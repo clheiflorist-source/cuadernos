@@ -10,41 +10,29 @@
  * Bodas Íntimas" (incluye Cap. 3, P2: "boda íntima").
  */
 
-export type Campo = {
-  /** Clave estable para autoguardado y correo. No cambiar entre versiones. */
-  id: string;
-  /** "pregunta" = pregunta normal · "frase" = frase por completar (display grande) */
-  tipo: "pregunta" | "frase";
-  /** Texto de la pregunta o de la frase a completar. */
-  titulo: string;
-  /** Párrafos de acompañamiento debajo de la pregunta. */
-  nota?: string[];
-  /** Párrafos que preparan un ejercicio, antes del título. */
-  lead?: string[];
-  /** Cita destacada dentro de un ejercicio (Cap. 6). */
-  cita?: string;
-};
+import type {
+  Campo,
+  Capitulo,
+  CartaBienvenida,
+  CartaCierre,
+  ContenidoCuaderno,
+  Instrucciones,
+  Libro,
+} from "@/lib/cuaderno-tipos";
 
-export type Capitulo = {
-  num: number;
-  titulo: string;
-  /** Frases editoriales de la página de apertura (en itálica). */
-  frases: string[];
-  /** Párrafos introductorios de la apertura. */
-  intro: string[];
-  /** Páginas de preguntas: cada arreglo interior es una página (máx. 2 campos). */
-  paginas: Campo[][];
-};
+export type { Campo, Capitulo } from "@/lib/cuaderno-tipos";
 
-export const LIBRO = {
+export const LIBRO: Libro = {
   titulo: "El Primer Capítulo",
   subtitulo: "Cuaderno de Descubrimiento",
   servicio: "Yolotzin · Bodas Íntimas",
   marca: "Clhei Floral Styling & Events",
   firma: "Tania Castorena",
-} as const;
+  slug: "yolotzin",
+  etiqueta: "Yolotzin",
+};
 
-export const INSTRUCCIONES = {
+export const INSTRUCCIONES: Instrucciones = {
   titulo: "Antes de comenzar",
   parrafos: [
     "Este cuaderno está pensado para responderse juntos.",
@@ -53,9 +41,9 @@ export const INSTRUCCIONES = {
   ],
   notaDigital:
     "Sus respuestas se guardan solas mientras escriben — arriba aparecerá un pequeño «Guardado» cada vez que suceda. Pueden cerrar esta página y volver cuando quieran: el cuaderno los estará esperando donde lo dejaron. Solo tengan en cuenta que vive en este navegador; si lo comienzan en la computadora, continúenlo ahí.",
-} as const;
+};
 
-export const CARTA_BIENVENIDA = {
+export const CARTA_BIENVENIDA: CartaBienvenida = {
   parrafos: [
     "Si este cuaderno llegó a ustedes, significa que oficialmente comenzamos a escribir esta historia juntos.",
     "Antes de hablar sobre flores, cronogramas, proveedores o decoración, hay algo que para nosotros es mucho más importante: conocer a las personas detrás de la celebración.",
@@ -68,9 +56,9 @@ export const CARTA_BIENVENIDA = {
     "Nos sentimos muy felices de acompañarlos desde este primer capítulo.",
   ],
   despedida: "Con cariño,",
-} as const;
+};
 
-export const CARTA_CIERRE = {
+export const CARTA_CIERRE: CartaCierre = {
   titulo: "Lo que acabamos de construir",
   parrafos: [
     "Si llegaron hasta aquí, quiero darles las gracias.",
@@ -83,7 +71,7 @@ export const CARTA_CIERRE = {
     "Es un honor acompañarlos en este momento tan importante de su historia.",
   ],
   despedida: "Con cariño,",
-} as const;
+};
 
 export const FRASE_FINAL =
   "Toda gran historia comienza con una página en blanco. Gracias por permitirnos escribir este primer capítulo junto a ustedes.";
@@ -682,3 +670,14 @@ export const CAMPOS_ORDENADOS: { capitulo: Capitulo; campo: Campo }[] =
   );
 
 export const TOTAL_CAMPOS = CAMPOS_ORDENADOS.length;
+
+/** Contenido empaquetado para el componente de diseño compartido. */
+export const CONTENIDO: ContenidoCuaderno = {
+  libro: LIBRO,
+  instrucciones: INSTRUCCIONES,
+  cartaBienvenida: CARTA_BIENVENIDA,
+  cartaCierre: CARTA_CIERRE,
+  fraseFinal: FRASE_FINAL,
+  capitulos: CAPITULOS,
+  totalCampos: TOTAL_CAMPOS,
+};
