@@ -1,0 +1,313 @@
+@import "tailwindcss";
+
+/* ============ Fuentes Clhei ============ */
+@font-face {
+  font-family: "Cinzel";
+  src: url("/fonts/Cinzel-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cinzel";
+  src: url("/fonts/Cinzel-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cinzel";
+  src: url("/fonts/Cinzel-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Jost";
+  src: url("/fonts/jost-v20-latin-300.woff2") format("woff2");
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Jost";
+  src: url("/fonts/jost-v20-latin-500.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Jost";
+  src: url("/fonts/jost-v20-latin-600.woff2") format("woff2");
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("/fonts/cormorant-garamond-v21-latin-500.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("/fonts/cormorant-garamond-v21-latin-600.woff2") format("woff2");
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("/fonts/cormorant-garamond-v21-latin-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ============ Tokens Clhei (design system) ============ */
+@theme {
+  --color-gold: #c1a875;
+  --color-gold-warm: #c9b591;
+  --color-gold-deep: #a7896b;
+  --color-cream: #faf9f5;
+  --color-parchment: #f6f3ee;
+  --color-sand: #ede8e0;
+  --color-linen: #c8b89e;
+  --color-sage: #86866c;
+  --color-charcoal: #33302b;
+  --color-ink-soft: #6b6459;
+  --color-ink-faint: #918a7d;
+  --color-line: #e5dfd3;
+  --color-line-gold: #d9c9a8;
+
+  --font-display: "Cinzel", Georgia, serif;
+  --font-editorial: "Cormorant Garamond", Georgia, serif;
+  --font-body: "Jost", "Segoe UI", system-ui, sans-serif;
+}
+
+/* ============ Base ============ */
+body {
+  background: var(--color-cream);
+  color: var(--color-charcoal);
+  font-family: var(--font-body);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-gold) 30%, transparent);
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+.kicker {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--color-gold-deep);
+}
+
+.accent-italic {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.link-gold {
+  color: var(--color-gold-deep);
+  text-decoration: underline;
+  text-decoration-color: var(--color-line-gold);
+  text-underline-offset: 3px;
+  transition: color 0.25s ease;
+}
+.link-gold:hover {
+  color: var(--color-charcoal);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ============ Punto de cursor de marca ============ */
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  pointer-events: none;
+  z-index: 90;
+  opacity: 0;
+  mix-blend-mode: multiply;
+  transition: opacity 0.3s ease, width 0.3s ease, height 0.3s ease,
+    background 0.3s ease;
+}
+.cursor-dot-on {
+  opacity: 0.85;
+}
+.cursor-dot-grow {
+  width: 52px;
+  height: 52px;
+  background: color-mix(in srgb, var(--color-gold) 26%, transparent);
+}
+@media (hover: none), (prefers-reduced-motion: reduce) {
+  .cursor-dot {
+    display: none;
+  }
+}
+
+/* ============ Animación de carga de marca ============ */
+.brand-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--color-cream);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1rem;
+  transition: transform 0.85s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.brand-loader-exit {
+  transform: translateY(-101%);
+}
+html:not(.js) .brand-loader {
+  display: none;
+}
+.loader-stage {
+  perspective: 620px;
+}
+.loader-mark-draw {
+  display: block;
+  transform-origin: center;
+  animation: mark-tilt 2s cubic-bezier(0.165, 0.84, 0.44, 1) both;
+}
+@keyframes mark-tilt {
+  from {
+    transform: rotateY(-38deg) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: rotateY(0deg) scale(1);
+    opacity: 1;
+  }
+}
+.loader-word {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: 0.4em;
+  padding-left: 0.4em;
+  color: var(--color-charcoal);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: loader-rise 0.7s 0.85s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+.loader-sub {
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  letter-spacing: 0.32em;
+  padding-left: 0.32em;
+  text-transform: uppercase;
+  color: var(--color-gold-deep);
+  opacity: 0;
+  transform: translateY(8px);
+  animation: loader-rise 0.7s 1.05s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+@keyframes loader-rise {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand-loader {
+    display: none;
+  }
+}
+
+/* ============ Cuaderno de Descubrimiento ============ */
+/* Las áreas de escritura son un renglón de tinta, no un campo de formulario:
+   el foco se señala con la propia línea inferior (que pasa a oro) y el caret
+   dorado — el anillo global de :focus-visible las encajonaría. */
+.cuaderno-writing {
+  caret-color: var(--color-gold-deep);
+}
+.cuaderno-writing:focus-visible {
+  outline: none;
+  border-radius: 0;
+}
+
+/* Marca de agua: se recompone con calma en cada vuelta de página y flota
+   apenas — presencia, no protagonismo. */
+.cuaderno-mark {
+  transition: transform 1.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: transform;
+}
+@keyframes cuaderno-float {
+  from {
+    transform: translateY(-9px) rotate(-1.4deg);
+  }
+  to {
+    transform: translateY(9px) rotate(1.4deg);
+  }
+}
+.cuaderno-float {
+  animation: cuaderno-float 28s ease-in-out infinite alternate;
+}
+.cuaderno-float-b {
+  animation: cuaderno-float 21s ease-in-out infinite alternate-reverse;
+}
+
+/* Anillo estela: acompaña al punto dorado con inercia. */
+.cuaderno-anillo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--color-gold) 65%, transparent);
+  pointer-events: none;
+  z-index: 89;
+  opacity: 0;
+  transition: opacity 0.4s ease, width 0.35s ease, height 0.35s ease,
+    border-color 0.35s ease;
+}
+.cuaderno-anillo-on {
+  opacity: 0.9;
+}
+.cuaderno-anillo-grow {
+  width: 62px;
+  height: 62px;
+  border-color: color-mix(in srgb, var(--color-gold) 38%, transparent);
+}
+
+@media (hover: none), (prefers-reduced-motion: reduce) {
+  .cuaderno-anillo {
+    display: none;
+  }
+  .cuaderno-float,
+  .cuaderno-float-b {
+    animation: none;
+  }
+  .cuaderno-mark {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
