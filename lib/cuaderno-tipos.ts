@@ -97,7 +97,6 @@ export type AccionesCuaderno = {
   entregarCuaderno: (entrega: EntregaCuaderno) => Promise<{ ok: boolean }>;
   crearEnlace: (datos: {
     correo: string;
-    origen: string;
     borrador: Omit<Borrador, "actualizado" | "correo">;
   }) => Promise<ResultadoEnlace>;
   sincronizarBorrador: (

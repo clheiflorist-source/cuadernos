@@ -7,8 +7,10 @@
  * vez y cada cuaderno solo aporta sus preguntas y su etiqueta.
  */
 
+import { headers } from "next/headers";
 import {
   depositoDisponible,
+  excedeLimite,
   guardarBorrador,
   leerBorrador,
   type Borrador,
@@ -18,6 +20,44 @@ import type {
   EntregaCuaderno,
   ResultadoEnlace,
 } from "./cuaderno-tipos";
+
+/**
+ * Base canónica del sitio, derivada SIEMPRE en el servidor — nunca del cliente.
+ * El origen es lo que se pone en el correo de continuidad; si viniera del
+ * navegador, cualquiera podría usar el dominio firmado de Clhei (Resend/DKIM)
+ * para mandar a una víctima un enlace hacia su propio sitio de phishing.
+ * Orden: URL canónica explícita → URL de despliegue que inyecta Vercel (no
+ * falsificable) → host de la petición sólo si es un origen nuestro (dev/local).
+ */
+async function baseDelSitio(): Promise<string | null> {
+  // 1) Dominio canónico explícito, si se configuró.
+  const explicita = process.env.CUADERNOS_BASE_URL;
+  if (explicita) return explicita.replace(/\/+$/, "");
+
+  // 2) Host de la petición SÓLO si es un origen nuestro. El allowlist deja
+  //    fuera cualquier dominio ajeno, así que aunque falsifiquen el header Host
+  //    no pueden apuntar el enlace a otro sitio. Da el dominio bonito
+  //    (cuadernos.clhei.florist) sin depender de configuración.
+  const host = (await headers()).get("host");
+  if (host && /^([a-z0-9-]+\.)*clhei\.florist$/.test(host)) {
+    return `https://${host}`;
+  }
+  if (host && /^localhost(:\d+)?$/.test(host)) return `http://${host}`;
+
+  // 3) URL de despliegue que inyecta Vercel (no falsificable por el cliente).
+  const vercel =
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL;
+  if (vercel) return `https://${vercel}`;
+
+  return null;
+}
+
+/** Pista de IP del cliente para el limitador de tasa (la pone la plataforma). */
+async function clienteIP(): Promise<string> {
+  const h = await headers();
+  const fwd = h.get("x-forwarded-for");
+  return (fwd?.split(",")[0] ?? h.get("x-real-ip") ?? "desconocida").trim();
+}
 
 type Preparado = {
   nombres: string;
@@ -168,15 +208,21 @@ export async function entregarCuaderno(
   if (!entrega?.nombres?.trim()) return { ok: false };
 
   const { libro, totalCampos } = contenido;
+
+  // Límite de tasa: evita que un bucle inunde el correo de Clhei y la hoja de
+  // respaldo. Best-effort (sólo si el depósito está disponible).
+  if (await excedeLimite(`entrega:${await clienteIP()}`, 12, 60 * 60)) {
+    return { ok: false };
+  }
+
   const preparado = preparar(contenido, entrega);
 
-  console.log(
-    `[cuaderno:${libro.slug}]`,
-    JSON.stringify({
-      nombres: preparado.nombres,
-      respuestas: entrega.respuestas,
-    }),
-  );
+  // Solo metadatos al log: las respuestas de la pareja son datos íntimos y los
+  // logs de Vercel son durables. El contenido viaja por correo/webhook, no aquí.
+  console.log(`[cuaderno:${libro.slug}] entrega`, {
+    respondidas: preparado.respondidas,
+    total: totalCampos,
+  });
 
   const [correo, webhook] = await Promise.all([
     correoResend({
@@ -197,26 +243,20 @@ export async function entregarCuaderno(
 
 /* ============ Continuidad entre dispositivos ============ */
 
-/** Orígenes desde los que aceptamos construir enlaces de continuidad. */
-function origenValido(origen: string): boolean {
-  return (
-    /^https:\/\/([a-z0-9-]+\.)*clhei\.florist\//.test(origen) ||
-    /^https:\/\/[a-z0-9-]+\.vercel\.app\//.test(origen) ||
-    /^http:\/\/localhost(:\d+)?\//.test(origen)
-  );
-}
-
 /**
  * Crea el enlace de continuidad: guarda el borrador en el depósito y
  * envía el enlace al correo de la pareja. Si el correo no puede salir
  * (p. ej. dominio aún sin verificar en Resend), el enlace igual se
  * devuelve para que lo guarden ellos mismos.
+ *
+ * El origen del enlace se deriva SIEMPRE en el servidor (baseDelSitio): nunca
+ * llega del cliente, para que nadie pueda usar el dominio firmado de Clhei y
+ * mandar a un tercero un enlace hacia un sitio ajeno.
  */
 export async function crearEnlace(
   contenido: ContenidoCuaderno,
   datos: {
     correo: string;
-    origen: string;
     borrador: Omit<Borrador, "actualizado" | "correo">;
   },
 ): Promise<ResultadoEnlace> {
@@ -224,7 +264,16 @@ export async function crearEnlace(
 
   const correo = datos.correo.trim().slice(0, 200);
   if (!/^\S+@\S+\.\S+$/.test(correo)) return { disponible: true, ok: false };
-  if (!origenValido(datos.origen)) return { disponible: true, ok: false };
+
+  const base = await baseDelSitio();
+  if (!base) return { disponible: true, ok: false };
+
+  // Límite de tasa: unos pocos enlaces por correo e IP al día. Frena el uso del
+  // dominio de Clhei como relay para enviar correo a direcciones ajenas.
+  const bloqueado =
+    (await excedeLimite(`enlace-correo:${correo}`, 5, 60 * 60 * 24)) ||
+    (await excedeLimite(`enlace-ip:${await clienteIP()}`, 15, 60 * 60 * 24));
+  if (bloqueado) return { disponible: true, ok: false };
 
   const token = crypto.randomUUID().replaceAll("-", "").slice(0, 24);
   const guardado = await guardarBorrador(
@@ -234,7 +283,7 @@ export async function crearEnlace(
   );
   if (!guardado) return { disponible: true, ok: false };
 
-  const enlace = `${datos.origen}?c=${token}`;
+  const enlace = `${base}/${contenido.libro.slug}?c=${token}`;
   const nombres = datos.borrador.nombres?.trim();
 
   const correoEnviado = await correoResend({

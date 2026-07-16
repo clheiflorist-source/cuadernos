@@ -60,6 +60,8 @@ export type TextosUI = {
   finalTitulo: string;
   finalGracias: (nombres: string) => string;
   ariaIdioma: string;
+  privacidadTexto: string;
+  privacidadEnlace: string;
 };
 
 export const TEXTOS_UI: Record<Lang, TextosUI> = {
@@ -119,6 +121,8 @@ export const TEXTOS_UI: Record<Lang, TextosUI> = {
     finalGracias: (n) =>
       `Gracias${n ? `, ${n}` : ""}. Lo leeremos completo antes de nuestra siguiente conversación.`,
     ariaIdioma: "Cambiar idioma",
+    privacidadTexto: "Al enviarlo, sus respuestas llegan únicamente a Clhei. ",
+    privacidadEnlace: "Cómo cuidamos sus datos",
   },
   en: {
     abrir: "Open the notebook",
@@ -176,5 +180,7 @@ export const TEXTOS_UI: Record<Lang, TextosUI> = {
     finalGracias: (n) =>
       `Thank you${n ? `, ${n}` : ""}. We'll read every page before our next conversation.`,
     ariaIdioma: "Change language",
+    privacidadTexto: "When you send it, your answers reach only Clhei. ",
+    privacidadEnlace: "How we care for your data",
   },
 };

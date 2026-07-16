@@ -556,7 +556,6 @@ export default function CuadernoUI({
     try {
       const res = await crearEnlace({
         correo: correoCont.trim(),
-        origen: `${window.location.origin}${window.location.pathname}`,
         borrador: { nombres, respuestas, pagina, enviado },
       });
       if (res.disponible && res.ok && res.token) {
@@ -1015,6 +1014,18 @@ export default function CuadernoUI({
                 >
                   {estado === "enviando" ? T.enviando : T.enviar}
                 </button>
+                <p className="mx-auto mt-8 max-w-md text-[0.8rem] leading-relaxed text-ink-faint">
+                  {T.privacidadTexto}
+                  <a
+                    href={`/privacidad${lang === "en" ? "?lang=en" : ""}`}
+                    target="_blank"
+                    rel="noopener"
+                    className="link-gold"
+                  >
+                    {T.privacidadEnlace}
+                  </a>
+                  .
+                </p>
                 {estado === "error" && (
                   <p className="mx-auto mt-8 max-w-md text-sm leading-relaxed text-ink-soft">
                     {T.errorEnvio}

@@ -88,3 +88,25 @@ export async function leerBorrador(
     return null;
   }
 }
+
+/**
+ * Limitador de tasa simple sobre el mismo Redis. Devuelve true si se debe
+ * BLOQUEAR (ya se superó `max` en la ventana). Protege las acciones que envían
+ * correo o escriben, para que un bucle no inunde el correo de Clhei ni la cuota
+ * de Resend/Upstash. Si el depósito no está disponible, no bloquea (best-effort).
+ */
+export async function excedeLimite(
+  clave: string,
+  max: number,
+  ventanaSeg: number,
+): Promise<boolean> {
+  if (!depositoDisponible()) return false;
+  try {
+    const n = (await comando(["INCR", `rl:${clave}`])) as number;
+    if (n === 1) await comando(["EXPIRE", `rl:${clave}`, ventanaSeg]);
+    return n > max;
+  } catch (e) {
+    console.error("[deposito] Error en limitador:", e);
+    return false; // ante la duda, no dejamos a la pareja fuera del cuaderno
+  }
+}

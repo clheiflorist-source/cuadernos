@@ -19,7 +19,6 @@ export async function entregarCuaderno(
 
 export async function crearEnlace(datos: {
   correo: string;
-  origen: string;
   borrador: Omit<Borrador, "actualizado" | "correo">;
 }): Promise<ResultadoEnlace> {
   return core.crearEnlace(CONTENIDO, datos);
