@@ -1,7 +1,7 @@
 "use client";
 
 import CuadernoUI from "@/components/CuadernoUI";
-import { CONTENIDO } from "./contenido";
+import { CONTENIDO, CONTENIDO_EN } from "./contenido";
 import {
   crearEnlace,
   entregarCuaderno,
@@ -18,6 +18,7 @@ export default function Cuaderno({
   return (
     <CuadernoUI
       contenido={CONTENIDO}
+      contenidoEn={CONTENIDO_EN}
       acciones={{
         entregarCuaderno,
         crearEnlace,

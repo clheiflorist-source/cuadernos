@@ -11,8 +11,8 @@ import type {
   Campo,
   Capitulo,
   ContenidoCuaderno,
-  Libro,
 } from "@/lib/cuaderno-tipos";
+import { TEXTOS_UI, type Lang, type TextosUI } from "@/lib/textos-ui";
 
 /* ============ Modelo de páginas ============ */
 
@@ -28,6 +28,51 @@ type Pagina =
 
 const ROMANOS = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
 
+/** Parte un título en dos renglones, antes de la última palabra. */
+function partirTitulo(t: string): [string, string] {
+  const i = t.lastIndexOf(" ");
+  return i === -1 ? [t, ""] : [t.slice(0, i), t.slice(i + 1)];
+}
+
+/* ============ Ornamento: filete con rombo, dibujado a mano ============ */
+
+function Ornamento({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 120 8"
+      className={className}
+      aria-hidden="true"
+      fill="none"
+    >
+      <line
+        x1="0"
+        y1="4"
+        x2="48"
+        y2="4"
+        stroke="currentColor"
+        strokeWidth="0.6"
+      />
+      <rect
+        x="56"
+        y="0"
+        width="8"
+        height="8"
+        transform="rotate(45 60 4)"
+        stroke="currentColor"
+        strokeWidth="0.7"
+      />
+      <line
+        x1="72"
+        y1="4"
+        x2="120"
+        y2="4"
+        stroke="currentColor"
+        strokeWidth="0.6"
+      />
+    </svg>
+  );
+}
+
 /* ============ Área de respuesta (escritura libre) ============ */
 
 function AreaRespuesta({
@@ -35,11 +80,13 @@ function AreaRespuesta({
   valor,
   onCambio,
   compacta = false,
+  T,
 }: {
   id: string;
   valor: string;
   onCambio: (id: string, texto: string) => void;
   compacta?: boolean;
+  T: TextosUI;
 }) {
   const ref = useRef<HTMLTextAreaElement>(null);
 
@@ -57,8 +104,8 @@ function AreaRespuesta({
         ref={ref}
         value={valor}
         onChange={(e) => onCambio(id, e.target.value)}
-        placeholder="Escriban aquí…"
-        aria-label="Su respuesta"
+        placeholder={T.placeholderRespuesta}
+        aria-label={T.ariaRespuesta}
         rows={compacta ? 3 : 4}
         className="cuaderno-writing peer w-full resize-none overflow-hidden border-0 border-b border-line bg-transparent pb-3 font-editorial font-medium text-[1.3rem] leading-[1.85] text-charcoal outline-none placeholder:italic placeholder:text-ink-faint/70 placeholder:transition-opacity placeholder:duration-500 focus:placeholder:opacity-40"
       />
@@ -76,10 +123,12 @@ function LineaNombres({
   valor,
   onCambio,
   className = "",
+  T,
 }: {
   valor: string;
   onCambio: (v: string) => void;
   className?: string;
+  T: TextosUI;
 }) {
   return (
     <div className={`relative ${className}`}>
@@ -87,8 +136,8 @@ function LineaNombres({
         type="text"
         value={valor}
         onChange={(e) => onCambio(e.target.value.slice(0, 120))}
-        placeholder="Escriban aquí sus nombres"
-        aria-label="Sus nombres"
+        placeholder={T.placeholderNombres}
+        aria-label={T.ariaNombres}
         className="cuaderno-writing peer w-full border-0 border-b border-line bg-transparent pb-2 text-center font-editorial text-2xl italic text-charcoal outline-none placeholder:text-ink-faint/60 placeholder:transition-opacity placeholder:duration-500 focus:placeholder:opacity-40"
       />
       <span
@@ -101,13 +150,13 @@ function LineaNombres({
 
 /* ============ Bloques tipográficos ============ */
 
-function Firma({ libro }: { libro: Libro }) {
+function Firma({ contenido }: { contenido: ContenidoCuaderno }) {
   return (
     <div className="mt-12">
       <p className="font-editorial text-[1.7rem] italic text-charcoal">
-        {libro.firma}
+        {contenido.libro.firma}
       </p>
-      <p className="kicker mt-2">{libro.marca}</p>
+      <p className="kicker mt-2">{contenido.libro.marca}</p>
     </div>
   );
 }
@@ -118,12 +167,14 @@ function CampoBloque({
   onCambio,
   enPar,
   numero,
+  T,
 }: {
   campo: Campo;
   valor: string;
   onCambio: (id: string, texto: string) => void;
   enPar: boolean;
   numero?: number;
+  T: TextosUI;
 }) {
   if (campo.tipo === "frase") {
     return (
@@ -149,7 +200,7 @@ function CampoBloque({
         <p className="mt-8 font-editorial font-medium text-[1.8rem] leading-snug text-charcoal md:text-[2.1rem]">
           {campo.titulo}
         </p>
-        <AreaRespuesta id={campo.id} valor={valor} onCambio={onCambio} />
+        <AreaRespuesta id={campo.id} valor={valor} onCambio={onCambio} T={T} />
       </div>
     );
   }
@@ -174,6 +225,7 @@ function CampoBloque({
         valor={valor}
         onCambio={onCambio}
         compacta={enPar}
+        T={T}
       />
     </div>
   );
@@ -181,15 +233,33 @@ function CampoBloque({
 
 /* ============ Cuaderno ============ */
 
+/**
+ * El diseño vive aquí una sola vez; cada cuaderno (Yolotzin, OLLIN, PAHTIĀ,
+ * DÁNGO) aporta solo su contenido. Detalles premium compartidos: capitular
+ * en las cartas, numeral romano fantasma en las aperturas, ornamento de
+ * rombo, hilo de avance con destello champaña. La portada y la página final
+ * son crema, como el resto del libro.
+ *
+ * Bilingüe opcional: si se pasa `contenidoEn`, aparece el conmutador ES/EN
+ * en la cabecera. Las respuestas comparten ids entre idiomas, así que
+ * cambiar de lengua nunca borra nada. El idioma se recuerda con el borrador
+ * y puede fijarse por URL con ?lang=en.
+ */
 export default function CuadernoUI({
   contenido,
+  contenidoEn,
   acciones,
   continuidadDisponible,
 }: {
   contenido: ContenidoCuaderno;
+  contenidoEn?: ContenidoCuaderno;
   acciones: AccionesCuaderno;
   continuidadDisponible: boolean;
 }) {
+  const bilingue = Boolean(contenidoEn);
+  const [lang, setLang] = useState<Lang>("es");
+  const C = lang === "en" && contenidoEn ? contenidoEn : contenido;
+  const T = TEXTOS_UI[lang];
   const {
     libro: LIBRO,
     instrucciones: INSTRUCCIONES,
@@ -198,11 +268,12 @@ export default function CuadernoUI({
     fraseFinal: FRASE_FINAL,
     capitulos: CAPITULOS,
     totalCampos: TOTAL_CAMPOS,
-  } = contenido;
+  } = C;
   const { entregarCuaderno, crearEnlace, sincronizarBorrador, obtenerBorrador } =
     acciones;
 
-  // Modelo de páginas y folios: se arma una vez por cuaderno.
+  // Modelo de páginas y folios: misma estructura en ambos idiomas (mismos
+  // ids, mismo número de páginas), así que el folio sobrevive al conmutador.
   const { PAGINAS, IDX_ENTREGA, IDX_FINAL, NUMERO_EN_CAPITULO } = useMemo(() => {
     const paginas: Pagina[] = [
       { tipo: "portada" },
@@ -230,9 +301,9 @@ export default function CuadernoUI({
       IDX_FINAL: paginas.length - 1,
       NUMERO_EN_CAPITULO: numero,
     };
-  }, [contenido]);
+  }, [CAPITULOS]);
 
-  const LS_KEY = `clhei-cuaderno-${LIBRO.slug}-v1`;
+  const LS_KEY = `clhei-cuaderno-${contenido.libro.slug}-v1`;
 
   const reduced = useReducedMotion();
   const [pagina, setPagina] = useState(0);
@@ -263,6 +334,7 @@ export default function CuadernoUI({
   indiceAbiertoRef.current = indiceAbierto;
 
   /* Restaurar sesión: enlace de continuidad (?c=) > este navegador.
+     Idioma: ?lang=en|es > preferencia guardada > español.
      Personalización por URL: ?pareja=Ana%20y%20Luis */
   useEffect(() => {
     (async () => {
@@ -278,6 +350,7 @@ export default function CuadernoUI({
         pagina?: number;
         enviado?: boolean;
         token?: string;
+        lang?: Lang;
       } | null = null;
       try {
         const crudo = localStorage.getItem(LS_KEY);
@@ -287,6 +360,11 @@ export default function CuadernoUI({
       }
 
       const params = new URLSearchParams(window.location.search);
+      const langUrl = params.get("lang");
+      if (bilingue && (langUrl === "en" || langUrl === "es")) setLang(langUrl);
+      else if (bilingue && (locales?.lang === "en" || locales?.lang === "es"))
+        setLang(locales.lang);
+
       const tokenUrl = params.get("c");
       let servidor: Borrador | null = null;
       if (tokenUrl && continuidadDisponible) {
@@ -333,6 +411,11 @@ export default function CuadernoUI({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [continuidadDisponible]);
 
+  /* El idioma vive también en el atributo lang del documento. */
+  useEffect(() => {
+    document.documentElement.lang = lang === "en" ? "en" : "es-MX";
+  }, [lang]);
+
   /* Autoguardado silencioso + señal discreta de «Guardado» */
   useEffect(() => {
     if (!listo) return;
@@ -341,7 +424,7 @@ export default function CuadernoUI({
       try {
         localStorage.setItem(
           LS_KEY,
-          JSON.stringify({ nombres, respuestas, pagina, enviado, token }),
+          JSON.stringify({ nombres, respuestas, pagina, enviado, token, lang }),
         );
         // Solo se anuncia cuando cambió lo escrito (no al pasar página
         // ni en el primer guardado tras cargar).
@@ -362,7 +445,7 @@ export default function CuadernoUI({
       }
     }, 350);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nombres, respuestas, pagina, enviado, token, listo]);
+  }, [nombres, respuestas, pagina, enviado, token, lang, listo]);
 
   /* Sincronización con el enlace de continuidad (si existe) */
   useEffect(() => {
@@ -501,9 +584,9 @@ export default function CuadernoUI({
   /* Índice: entradas navegables */
   const indice = useMemo(() => {
     const entradas: { etiqueta: string; detalle?: string; idx: number }[] = [
-      { etiqueta: "Portada", idx: 0 },
+      { etiqueta: T.portadaIdx, idx: 0 },
       { etiqueta: INSTRUCCIONES.titulo, idx: 1 },
-      { etiqueta: "Carta de bienvenida", idx: 2 },
+      { etiqueta: T.cartaIdx, idx: 2 },
     ];
     for (const cap of CAPITULOS) {
       const idx = PAGINAS.findIndex(
@@ -515,23 +598,24 @@ export default function CuadernoUI({
       ).length;
       entradas.push({
         etiqueta: `${ROMANOS[cap.num - 1]} · ${cap.titulo}`,
-        detalle: `${hechas} de ${campos.length}`,
+        detalle: T.avance(hechas, campos.length),
         idx,
       });
     }
     entradas.push(
       { etiqueta: CARTA_CIERRE.titulo, idx: IDX_ENTREGA - 1 },
-      { etiqueta: "La entrega", idx: IDX_ENTREGA },
+      { etiqueta: T.entregaIdx, idx: IDX_ENTREGA },
     );
     return entradas;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [respuestas, contenido]);
+  }, [respuestas, C, T]);
 
   const actual = PAGINAS[pagina];
   const capActual =
     actual.tipo === "apertura" || actual.tipo === "preguntas"
       ? actual.cap
       : null;
+  const [titulo1, titulo2] = partirTitulo(LIBRO.titulo);
 
   const transicion = reduced
     ? { duration: 0 }
@@ -544,7 +628,7 @@ export default function CuadernoUI({
       {/* ——— Marca de agua viva + anillo estela ——— */}
       <Ambiente pagina={pagina} />
 
-      {/* ——— Barra superior: lockup Clhei · Servicio + estado + índice ——— */}
+      {/* ——— Barra superior: lockup Clhei · Servicio + idioma + índice ——— */}
       <header className="fixed inset-x-0 top-0 z-30 bg-cream/85 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5 md:h-20 md:px-8">
           <span className="flex items-center gap-3 md:gap-4">
@@ -559,10 +643,10 @@ export default function CuadernoUI({
               {LIBRO.etiqueta}
             </span>
           </span>
-          <span className="flex items-center gap-4 md:gap-8">
+          <span className="flex items-center gap-4 md:gap-7">
             {capActual && (
               <span className="kicker hidden text-ink-faint lg:block">
-                Capítulo {ROMANOS[capActual.num - 1]} · {capActual.titulo}
+                {T.capitulo} {ROMANOS[capActual.num - 1]} · {capActual.titulo}
               </span>
             )}
             <span
@@ -571,23 +655,54 @@ export default function CuadernoUI({
                 guardadoVisible ? "opacity-100" : "opacity-0"
               }`}
             >
-              Guardado
+              {T.guardado}
             </span>
+            {/* Conmutador de idioma (solo si el cuaderno es bilingüe) */}
+            {bilingue && (
+              <span
+                className="flex items-center gap-2"
+                role="group"
+                aria-label={T.ariaIdioma}
+              >
+                {(["es", "en"] as const).map((l, i) => (
+                  <span key={l} className="flex items-center gap-2">
+                    {i > 0 && (
+                      <span
+                        aria-hidden="true"
+                        className="h-3 w-px bg-line-gold"
+                      />
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setLang(l)}
+                      aria-pressed={lang === l}
+                      className={`cursor-pointer font-display text-[0.68rem] uppercase tracking-[0.28em] transition-colors duration-300 ${
+                        lang === l
+                          ? "text-gold-deep underline decoration-line-gold underline-offset-4"
+                          : "text-ink-faint hover:text-charcoal"
+                      }`}
+                    >
+                      {l.toUpperCase()}
+                    </button>
+                  </span>
+                ))}
+              </span>
+            )}
             {pagina > 0 && pagina < IDX_FINAL && (
               <button
                 type="button"
                 onClick={() => setIndiceAbierto(true)}
                 className="kicker cursor-pointer border border-line-gold px-4 py-2.5 transition-colors duration-300 hover:border-gold-deep hover:text-charcoal md:px-5"
               >
-                Índice
+                {T.indice}
               </button>
             )}
           </span>
         </div>
-        {/* hilo de avance, fino como una costura */}
+        {/* hilo de avance con destello champaña, fino como una costura */}
         <div className="h-px w-full bg-line/60">
           <div
-            className="h-px w-full origin-left bg-gold transition-transform duration-700"
+            className="cuaderno-thread h-px w-full origin-left transition-transform duration-700"
             style={{ transform: `scaleX(${pagina / IDX_FINAL})` }}
           />
         </div>
@@ -609,22 +724,27 @@ export default function CuadernoUI({
                 <LogoMark size={54} className="opacity-90" />
                 <p className="kicker mt-10">{LIBRO.subtitulo}</p>
                 <h1 className="font-display mt-6 text-4xl leading-tight tracking-[0.08em] text-charcoal md:text-5xl">
-                  El Primer
-                  <br />
-                  Capítulo
+                  {titulo1}
+                  {titulo2 && (
+                    <>
+                      <br />
+                      {titulo2}
+                    </>
+                  )}
                 </h1>
                 <p className="kicker mt-6 text-sage">{LIBRO.servicio}</p>
                 <LineaNombres
                   valor={nombres}
                   onCambio={setNombres}
                   className="mt-14 w-full max-w-sm"
+                  T={T}
                 />
                 <button
                   type="button"
                   onClick={() => irA(1)}
                   className="kicker mt-14 cursor-pointer border border-gold-deep/40 px-9 py-3.5 text-charcoal transition-colors duration-300 hover:border-gold-deep hover:text-gold-deep"
                 >
-                  Abrir el cuaderno
+                  {T.abrir}
                 </button>
                 <p className="mt-16 text-[0.7rem] tracking-[0.2em] text-ink-faint">
                   {LIBRO.marca.toUpperCase()}
@@ -648,15 +768,13 @@ export default function CuadernoUI({
                     </p>
                   ))}
                 </div>
-                <div className="mt-12 w-14 border-t border-line-gold" />
+                <Ornamento className="mt-12 w-24 text-gold-deep/50" />
                 <p className="accent-italic mt-8 max-w-prose text-[1.05rem] leading-relaxed text-ink-soft">
                   {INSTRUCCIONES.notaDigital}
                 </p>
                 {!almacenOk && (
                   <p className="accent-italic mt-6 max-w-prose text-[1.05rem] leading-relaxed text-gold-deep">
-                    En este navegador no pudimos activar el guardado automático.
-                    Les sugerimos responder el cuaderno en una sola visita, o
-                    conservar sus respuestas aparte antes de cerrar la página.
+                    {T.avisoAlmacen}
                   </p>
                 )}
 
@@ -665,11 +783,9 @@ export default function CuadernoUI({
                   <div className="mt-12 border-t border-line/60 pt-8">
                     {!token ? (
                       <>
-                        <p className="kicker">Para llevarlo a donde vayan</p>
+                        <p className="kicker">{T.contKicker}</p>
                         <p className="mt-4 max-w-prose text-[0.95rem] leading-relaxed text-ink-soft">
-                          Si quieren continuar el cuaderno desde otro
-                          dispositivo, escriban su correo y les enviamos un
-                          enlace que guarda su avance.
+                          {T.contInvitacion}
                         </p>
                         <div className="mt-6 flex max-w-md items-end gap-4">
                           <div className="relative flex-1">
@@ -679,8 +795,8 @@ export default function CuadernoUI({
                               onChange={(e) =>
                                 setCorreoCont(e.target.value.slice(0, 200))
                               }
-                              placeholder="su@correo.com"
-                              aria-label="Su correo"
+                              placeholder={T.contPlaceholder}
+                              aria-label={T.contAria}
                               className="cuaderno-writing peer w-full border-0 border-b border-line bg-transparent pb-2 font-editorial font-medium text-lg text-charcoal outline-none placeholder:italic placeholder:text-ink-faint/60"
                             />
                             <span
@@ -698,33 +814,28 @@ export default function CuadernoUI({
                             className="kicker cursor-pointer border border-line-gold px-5 py-3 transition-colors duration-300 hover:border-gold-deep hover:text-gold-deep disabled:cursor-default disabled:opacity-40"
                           >
                             {contEstado === "creando"
-                              ? "Preparando…"
-                              : "Enviar enlace"}
+                              ? T.contPreparando
+                              : T.contEnviar}
                           </button>
                         </div>
                         {contEstado === "error" && (
                           <p className="mt-4 max-w-prose text-sm leading-relaxed text-ink-soft">
-                            No pudimos preparar el enlace en este momento.
-                            Pueden seguir respondiendo con tranquilidad e
-                            intentarlo más tarde.
+                            {T.contError}
                           </p>
                         )}
                       </>
                     ) : (
                       <>
-                        <p className="kicker">Para llevarlo a donde vayan</p>
+                        <p className="kicker">{T.contKicker}</p>
                         {contEstado === "correo" && (
                           <p className="accent-italic mt-4 max-w-prose text-[1.05rem] leading-relaxed text-ink-soft">
-                            Les enviamos el enlace a su correo. Ábranlo en
-                            cualquier dispositivo y el cuaderno continuará
-                            donde lo dejaron.
+                            {T.contCorreo}
                           </p>
                         )}
                         {contEstado === "enlace" && (
                           <div className="mt-4 max-w-prose">
                             <p className="accent-italic text-[1.05rem] leading-relaxed text-ink-soft">
-                              Su enlace quedó listo. Guárdenlo con cariño — es
-                              la llave de su cuaderno en cualquier dispositivo:
+                              {T.contEnlaceListo}
                             </p>
                             <div className="mt-4 flex items-center gap-4">
                               <span className="min-w-0 flex-1 truncate border-b border-line pb-1 text-sm text-ink-soft">
@@ -735,15 +846,14 @@ export default function CuadernoUI({
                                 onClick={copiarEnlace}
                                 className="kicker cursor-pointer whitespace-nowrap transition-colors hover:text-charcoal"
                               >
-                                {copiado ? "Copiado" : "Copiar"}
+                                {copiado ? T.copiado : T.copiar}
                               </button>
                             </div>
                           </div>
                         )}
                         {contEstado === "quieto" && (
                           <p className="accent-italic mt-4 max-w-prose text-[1.05rem] leading-relaxed text-ink-soft">
-                            Su enlace de continuidad está activo: el avance de
-                            este cuaderno viaja con él.
+                            {T.contActivo}
                           </p>
                         )}
                       </>
@@ -753,15 +863,17 @@ export default function CuadernoUI({
               </div>
             )}
 
-            {/* Carta de bienvenida */}
+            {/* Carta de bienvenida — con capitular */}
             {actual.tipo === "carta" && (
               <div className="py-6">
-                <h1 className="kicker">Carta de bienvenida</h1>
+                <h1 className="kicker">{T.cartaIdx}</h1>
                 <div className="mt-10 space-y-6">
-                  {CARTA_BIENVENIDA.parrafos.map((t) => (
+                  {CARTA_BIENVENIDA.parrafos.map((t, i) => (
                     <p
                       key={t}
-                      className="max-w-prose text-[1.05rem] leading-[1.9] text-charcoal/90"
+                      className={`max-w-prose text-[1.05rem] leading-[1.9] text-charcoal/90 ${
+                        i === 0 ? "cuaderno-dropcap" : ""
+                      }`}
                     >
                       {t}
                     </p>
@@ -770,19 +882,27 @@ export default function CuadernoUI({
                     {CARTA_BIENVENIDA.despedida}
                   </p>
                 </div>
-                <Firma libro={LIBRO} />
+                <Firma contenido={C} />
               </div>
             )}
 
-            {/* Apertura de capítulo */}
+            {/* Apertura de capítulo — con numeral fantasma y ornamento */}
             {actual.tipo === "apertura" && (
-              <div className="flex min-h-[64dvh] flex-col justify-center text-center">
-                <p className="kicker">Capítulo {ROMANOS[actual.cap.num - 1]}</p>
-                <h1 className="font-display mt-6 text-4xl tracking-[0.06em] text-charcoal md:text-5xl">
+              <div className="relative flex min-h-[64dvh] flex-col justify-center text-center">
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none font-editorial italic leading-none text-gold/[0.08] text-[13rem] md:text-[19rem]"
+                >
+                  {ROMANOS[actual.cap.num - 1]}
+                </span>
+                <p className="kicker relative">
+                  {T.capitulo} {ROMANOS[actual.cap.num - 1]}
+                </p>
+                <h1 className="font-display relative mt-6 text-4xl tracking-[0.06em] text-charcoal md:text-5xl">
                   {actual.cap.titulo}
                 </h1>
-                <div className="mx-auto mt-10 w-14 border-t border-line-gold" />
-                <div className="mt-10 space-y-5">
+                <Ornamento className="relative mx-auto mt-9 w-28 text-gold-deep/60" />
+                <div className="relative mt-9 space-y-5">
                   {actual.cap.frases.map((f) => (
                     <p
                       key={f}
@@ -793,7 +913,7 @@ export default function CuadernoUI({
                   ))}
                 </div>
                 {actual.cap.intro.length > 0 && (
-                  <div className="mx-auto mt-10 max-w-xl space-y-5 text-left">
+                  <div className="relative mx-auto mt-10 max-w-xl space-y-5 text-left">
                     {actual.cap.intro.map((t) => (
                       <p key={t} className="leading-[1.9] text-ink-soft">
                         {t}
@@ -808,7 +928,8 @@ export default function CuadernoUI({
             {actual.tipo === "preguntas" && (
               <div className="py-6">
                 <h1 className="sr-only">
-                  Capítulo {ROMANOS[actual.cap.num - 1]} · {actual.cap.titulo}
+                  {T.capitulo} {ROMANOS[actual.cap.num - 1]} ·{" "}
+                  {actual.cap.titulo}
                 </h1>
                 <p className="kicker" aria-hidden="true">
                   {ROMANOS[actual.cap.num - 1]} · {actual.cap.titulo}
@@ -822,24 +943,27 @@ export default function CuadernoUI({
                       onCambio={onCambio}
                       enPar={actual.campos.length > 1}
                       numero={NUMERO_EN_CAPITULO.get(campo.id)}
+                      T={T}
                     />
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Epílogo · carta de cierre */}
+            {/* Epílogo · carta de cierre — con capitular */}
             {actual.tipo === "cierre" && (
               <div className="py-6">
-                <p className="kicker">Epílogo</p>
+                <p className="kicker">{T.epilogo}</p>
                 <h1 className="font-display mt-6 text-3xl tracking-[0.06em] text-charcoal">
                   {CARTA_CIERRE.titulo}
                 </h1>
                 <div className="mt-10 space-y-6">
-                  {CARTA_CIERRE.parrafos.map((t) => (
+                  {CARTA_CIERRE.parrafos.map((t, i) => (
                     <p
                       key={t}
-                      className="max-w-prose text-[1.05rem] leading-[1.9] text-charcoal/90"
+                      className={`max-w-prose text-[1.05rem] leading-[1.9] text-charcoal/90 ${
+                        i === 0 ? "cuaderno-dropcap" : ""
+                      }`}
                     >
                       {t}
                     </p>
@@ -848,41 +972,38 @@ export default function CuadernoUI({
                     {CARTA_CIERRE.despedida}
                   </p>
                 </div>
-                <Firma libro={LIBRO} />
+                <Firma contenido={C} />
               </div>
             )}
 
             {/* La entrega */}
             {actual.tipo === "entrega" && (
               <div className="flex min-h-[64dvh] flex-col justify-center text-center">
-                <p className="kicker">La entrega</p>
+                <p className="kicker">{T.entregaIdx}</p>
                 <h1 className="font-display mt-6 text-3xl tracking-[0.06em] text-charcoal md:text-4xl">
-                  Su cuaderno está listo
+                  {T.listoTitulo}
                 </h1>
                 <p className="mx-auto mt-8 max-w-lg leading-[1.9] text-ink-soft">
-                  Cuando sientan que estas páginas dicen lo que querían decir,
-                  envíenlas. Las leeremos con calma, más de una vez, antes de
-                  dar juntos el siguiente paso.
+                  {T.listoCuerpo}
                 </p>
                 <p className="mt-6 text-sm text-ink-faint">
-                  Llevan {respondidas} de {TOTAL_CAMPOS} respuestas. Si quieren
-                  volver a alguna página, el índice los lleva.
+                  {T.llevan(respondidas, TOTAL_CAMPOS)}
                 </p>
                 {respondidas < TOTAL_CAMPOS * 0.6 && (
                   <p className="accent-italic mx-auto mt-4 max-w-md text-[0.95rem] leading-relaxed text-ink-soft">
-                    Aún hay páginas esperándolos: pueden volver a ellas primero
-                    o enviarlo así — el cuaderno no tiene prisa.
+                    {T.sinPrisa}
                   </p>
                 )}
                 {!nombres.trim() && (
                   <div className="mx-auto mt-10 w-full max-w-sm">
                     <p className="accent-italic text-ink-soft">
-                      Antes de enviarlo, escriban sus nombres en la portada:
+                      {T.antesNombres}
                     </p>
                     <LineaNombres
                       valor={nombres}
                       onCambio={setNombres}
                       className="mt-4"
+                      T={T}
                     />
                   </div>
                 )}
@@ -892,23 +1013,20 @@ export default function CuadernoUI({
                   disabled={!nombres.trim() || estado === "enviando"}
                   className="kicker mx-auto mt-12 cursor-pointer border border-gold-deep/50 px-10 py-4 text-charcoal transition-colors duration-300 hover:border-gold-deep hover:text-gold-deep disabled:cursor-default disabled:opacity-40"
                 >
-                  {estado === "enviando"
-                    ? "Enviando su cuaderno…"
-                    : "Enviar nuestro cuaderno a Clhei"}
+                  {estado === "enviando" ? T.enviando : T.enviar}
                 </button>
                 {estado === "error" && (
                   <p className="mx-auto mt-8 max-w-md text-sm leading-relaxed text-ink-soft">
-                    Algo no permitió que el cuaderno llegara. Sus respuestas
-                    siguen guardadas: intenten de nuevo en un momento o{" "}
+                    {T.errorEnvio}
                     <a
                       href={waLink()}
                       target="_blank"
                       rel="noopener"
                       className="link-gold"
                     >
-                      escríbannos por WhatsApp
-                    </a>{" "}
-                    y lo resolvemos juntos.
+                      {T.errorWhats}
+                    </a>
+                    {T.errorEnvioFin}
                   </p>
                 )}
               </div>
@@ -919,13 +1037,12 @@ export default function CuadernoUI({
               <div className="flex min-h-[70dvh] flex-col items-center justify-center text-center">
                 <LogoMark size={50} className="opacity-85" />
                 <h1 className="font-display mt-10 text-3xl tracking-[0.06em] text-charcoal">
-                  Su cuaderno ya está con nosotros
+                  {T.finalTitulo}
                 </h1>
                 <p className="mx-auto mt-6 max-w-md leading-[1.9] text-ink-soft">
-                  Gracias{nombres.trim() ? `, ${nombres.trim()}` : ""}. Lo
-                  leeremos completo antes de nuestra siguiente conversación.
+                  {T.finalGracias(nombres.trim())}
                 </p>
-                <div className="mx-auto mt-12 w-14 border-t border-line-gold" />
+                <Ornamento className="mx-auto mt-12 w-28 text-gold-deep/50" />
                 <p className="accent-italic mx-auto mt-10 max-w-md text-lg leading-[1.8] text-charcoal/85">
                   {FRASE_FINAL}
                 </p>
@@ -949,7 +1066,7 @@ export default function CuadernoUI({
             className="pointer-events-none fixed inset-x-0 bottom-24 z-30 flex justify-center px-6"
           >
             <p className="accent-italic border border-line bg-parchment px-6 py-3 text-[0.95rem] text-ink-soft">
-              Bienvenidos de vuelta — retomamos donde lo dejaron.
+              {T.retomado}
             </p>
           </motion.div>
         )}
@@ -964,7 +1081,7 @@ export default function CuadernoUI({
               onClick={() => irA(pagina - 1)}
               className="kicker cursor-pointer py-2 transition-colors hover:text-charcoal"
             >
-              ← Anterior
+              {T.anterior}
             </button>
             <span className="hidden text-[0.68rem] tracking-[0.3em] text-ink-faint md:block">
               {pagina + 1} / {PAGINAS.length}
@@ -975,11 +1092,11 @@ export default function CuadernoUI({
                 onClick={() => irA(pagina + 1)}
                 className="kicker cursor-pointer py-2 text-gold-deep transition-colors hover:text-charcoal"
               >
-                Siguiente →
+                {T.siguiente}
               </button>
             ) : (
               <span aria-hidden className="kicker invisible py-2">
-                Siguiente →
+                {T.siguiente}
               </span>
             )}
           </div>
@@ -998,14 +1115,14 @@ export default function CuadernoUI({
           >
             <div className="mx-auto max-w-md px-6 py-20">
               <div className="flex items-center justify-between">
-                <p className="kicker">Índice</p>
+                <p className="kicker">{T.indice}</p>
                 <button
                   type="button"
                   onClick={() => setIndiceAbierto(false)}
                   className="kicker cursor-pointer transition-colors hover:text-charcoal"
-                  aria-label="Cerrar índice"
+                  aria-label={T.ariaCerrarIndice}
                 >
-                  Cerrar
+                  {T.cerrar}
                 </button>
               </div>
               <ul className="mt-10 space-y-1">

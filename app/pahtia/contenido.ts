@@ -540,3 +540,501 @@ export const CONTENIDO: ContenidoCuaderno = {
   capitulos: CAPITULOS,
   totalCampos: TOTAL_CAMPOS,
 };
+
+/* ============ Inglés · traducción fiel del maestro ============ */
+/* Mismos ids de campo y misma estructura de páginas que el español, para que
+   las respuestas sobrevivan al cambio de idioma. La entrega a Clhei siempre
+   sale en español (actions.ts usa CONTENIDO). */
+
+const CAPITULOS_EN: Capitulo[] = [
+  {
+    num: 1,
+    titulo: "The Two of You",
+    frases: [
+      "Before we receive your wedding, we want to know the people who have given it shape.",
+    ],
+    intro: [
+      "Over the past months you've made many decisions and walked an important part of the road together.",
+      "Before learning every detail of the project, we want to pause and discover who you are as a couple, how you live the important moments, and what you need to feel accompanied when your wedding day arrives.",
+    ],
+    paginas: [
+      [
+        {
+          id: "c1p1",
+          tipo: "pregunta",
+          titulo:
+            "If you had to describe your relationship in three words, which would they be — and why?",
+          nota: [
+            "We're not looking for a perfect definition. Choose words you both recognize yourselves in, ones that express the way you live your relationship.",
+          ],
+        },
+        {
+          id: "c1p2",
+          tipo: "pregunta",
+          titulo:
+            "After everything you've built together, what do you feel makes you a good team?",
+          nota: [
+            "Think of the way you support each other, face challenges, and find balance when you each see things differently.",
+          ],
+        },
+      ],
+      [
+        {
+          id: "c1p3",
+          tipo: "pregunta",
+          titulo:
+            "When an unexpected situation arises, how does each of you tend to react?",
+          nota: [
+            "Perhaps one of you needs to solve it right away, while the other prefers to pause and think. Knowing how you respond will help us accompany you with greater sensitivity and calm.",
+          ],
+        },
+        {
+          id: "c1p4",
+          tipo: "pregunta",
+          titulo:
+            "What small, everyday moment do you feel best captures who you are as a couple?",
+          nota: [
+            "It could be a routine, an activity you enjoy, a recurring conversation, or something simple that always makes you feel close.",
+          ],
+        },
+      ],
+      [
+        {
+          id: "c1p5",
+          tipo: "pregunta",
+          titulo:
+            "In this final stretch before the wedding, what do you need from each other to keep enjoying the process?",
+          nota: [
+            "It could be patience, time, communication, trust, space, or simply remembering together why you began building this celebration.",
+          ],
+        },
+        {
+          id: "c1p6",
+          tipo: "pregunta",
+          titulo:
+            "When your wedding day arrives, how would you like to feel knowing everything is in our hands?",
+          nota: [
+            "Think of the feeling you want to hold onto: calm, freedom, excitement, trust, or the chance to be fully present.",
+          ],
+        },
+      ],
+      [
+        {
+          id: "c1p7",
+          tipo: "pregunta",
+          titulo:
+            "Is there anything about you that you feel is important for us to know, so we can accompany you better?",
+          nota: [
+            "It could be a worry, a particular way of communicating, something that makes you feel safe, or any personal detail that helps us better care for your experience.",
+          ],
+        },
+      ],
+    ],
+  },
+  {
+    num: 2,
+    titulo: "The Story You've Built",
+    frases: [
+      "Before reaching this moment, there were conversations, decisions, and small steps that are also part of your wedding's story.",
+    ],
+    intro: [
+      "The celebration now taking shape began long before choosing a venue or hiring a vendor. It began with an idea, with what you both imagined when you decided to marry, and with every choice you made along the way.",
+      "In these pages we want to know how the project we're now receiving was born, and what it has meant to you to build it together.",
+    ],
+    paginas: [
+      [
+        {
+          id: "c2p1",
+          tipo: "pregunta",
+          titulo:
+            "When you first began imagining your wedding, what was the first idea you both agreed on?",
+          nota: [
+            "It may have been a feeling, a place, a way of celebrating, or something you knew from the start had to be part of that day.",
+          ],
+        },
+        {
+          id: "c2p2",
+          tipo: "pregunta",
+          titulo:
+            "Looking at everything you've built so far, which decision do you feel best represents the two of you?",
+          nota: [
+            "It doesn't have to be the most important or the most visible. Think of the choice that, when you see it, makes you feel this wedding truly speaks of you.",
+          ],
+        },
+      ],
+      [
+        {
+          id: "c2p3",
+          tipo: "pregunta",
+          titulo:
+            "Which part of the planning have you especially enjoyed together?",
+          nota: [
+            "It could be visiting venues, imagining the design, choosing the music, tasting the menu, or simply making time to talk about what each of you hopes for the wedding.",
+          ],
+        },
+        {
+          id: "c2p4",
+          tipo: "pregunta",
+          titulo:
+            "Which decision was the hardest to make, and what finally helped you resolve it?",
+          nota: [
+            "We're not judging whether it was right or wrong. We want to understand what mattered to you as you found a solution.",
+          ],
+        },
+      ],
+      [
+        {
+          id: "c2p5",
+          tipo: "pregunta",
+          titulo:
+            "After all the road you've traveled, what are you especially proud of when you look at the wedding you've built?",
+          nota: [
+            "It could be a decision, the way you worked together, something you resolved, or the intention you managed to hold onto throughout the process.",
+          ],
+        },
+        {
+          id: "c2p6",
+          tipo: "pregunta",
+          titulo:
+            "If you could go back to the moment you started planning, what would you like to say to those two people who were just beginning to imagine their wedding?",
+          nota: [
+            "Think of what you learned, what you now know, and how you'd like to remember this stage once it's all over.",
+          ],
+        },
+      ],
+    ],
+  },
+  {
+    num: 3,
+    titulo: "What You've Imagined",
+    frases: [
+      "After so many months of making decisions, the moment comes to remember how you wish to live everything you've built.",
+    ],
+    intro: [
+      "Behind every choice there's an intention: an emotion you want to feel, a moment you look forward to, or a particular way of living the celebration.",
+      "Before reviewing how the wedding is organized, we want to understand how you imagine it, and what would need to remain present for the day to feel truly yours.",
+    ],
+    paginas: [
+      [
+        {
+          id: "c3p1",
+          tipo: "pregunta",
+          titulo:
+            "When you think of your wedding day, what is the first image that comes to mind?",
+          nota: [
+            "It could be a moment, a person, an emotion, a space, or a simple scene you've imagined many times during the planning.",
+          ],
+        },
+        {
+          id: "c3p2",
+          tipo: "pregunta",
+          titulo: "Which moment are you most looking forward to?",
+          nota: [
+            "It could be while getting ready, when you see each other for the first time, during the ceremony, entering the celebration, or an instant that holds special meaning for you alone.",
+          ],
+        },
+      ],
+      [
+        {
+          id: "c3p3",
+          tipo: "pregunta",
+          titulo: "How would you like to feel during your wedding day?",
+          nota: [
+            "Think beyond the natural emotion of the moment. We'd like to know what feeling you want to hold onto while everything happens around you.",
+          ],
+        },
+        {
+          id: "c3p4",
+          tipo: "pregunta",
+          titulo:
+            "Is there a detail, decision, or moment that might seem small, but holds special meaning for you?",
+          nota: [
+            "It could be a song, a tradition, a photograph, a few words, an object, or anything we should recognize and care for during the day.",
+          ],
+        },
+      ],
+      [
+        {
+          id: "c3p5",
+          tipo: "pregunta",
+          titulo:
+            "Is there a moment you'd like to live more intimately, without feeling you must move straight on to what comes next?",
+          nota: [
+            "We want to identify the instants that need room to be enjoyed calmly, so the pace of the wedding doesn't rush them by.",
+          ],
+        },
+      ],
+    ],
+  },
+  {
+    num: 4,
+    titulo: "The People",
+    frases: [
+      "A wedding gathers many people, but some presences carry a meaning that goes far beyond being invited.",
+    ],
+    intro: [
+      "During the celebration there will be embraces, encounters, and moments that may last only minutes, but that you'll remember for many years.",
+      "Before reviewing seating, responsibilities, or roles, we want to know the people who hold an especially important place in your story, and understand which moments you wish to share with them.",
+    ],
+    paginas: [
+      [
+        {
+          id: "c4p1",
+          tipo: "pregunta",
+          titulo:
+            "Who are the people whose presence will make your wedding day feel complete?",
+          nota: [
+            "They may be family, friends, or people who have accompanied you through important moments. Tell us who they are and what they mean to you.",
+          ],
+        },
+        {
+          id: "c4p2",
+          tipo: "pregunta",
+          titulo:
+            "Who do you want to share the moments before the ceremony with?",
+          nota: [
+            "Think of the people you'd like nearby while getting ready, and the atmosphere you want to live during those hours.",
+          ],
+        },
+      ],
+      [
+        {
+          id: "c4p3",
+          tipo: "pregunta",
+          titulo:
+            "Is there someone with whom you hope to share an especially meaningful moment during the wedding?",
+          nota: [
+            "It could be an embrace, a few words, a photograph, a dance, or simply a few minutes together you'd like to protect within the pace of the celebration.",
+          ],
+        },
+      ],
+      [
+        {
+          id: "c4p4",
+          tipo: "pregunta",
+          titulo:
+            "Is there someone who, though no longer able to be there in person, you'd like to remember or feel close that day?",
+          nota: [
+            "It may be a person, a pet, or someone who left an important mark on your lives. We'd like to understand what place you'd like to give them within the celebration.",
+          ],
+        },
+      ],
+      [
+        {
+          id: "c4p5",
+          tipo: "pregunta",
+          titulo:
+            "Every family has its own stories and relationships. Is there a dynamic you feel is important for us to know, so we can accompany you with greater sensitivity?",
+          nota: [
+            "You don't need to share more than you're comfortable with. We only want to know what can help us protect your peace of mind and avoid uncomfortable situations during the day.",
+          ],
+        },
+      ],
+      [
+        {
+          id: "c4p6",
+          tipo: "pregunta",
+          titulo:
+            "When you picture all those people gathered together, what would you like to thank them for?",
+          nota: [
+            "You don't need to write a speech. Simply think of what you feel knowing they'll be there, accompanying you in this moment.",
+          ],
+        },
+      ],
+    ],
+  },
+  {
+    num: 5,
+    titulo: "What Matters Most",
+    frases: [
+      "When a day is full of moments, being clear about what truly matters lets you protect what shouldn't be lost.",
+    ],
+    intro: [
+      "During the wedding, many things will be happening at once. Some will follow exactly the path you imagined, and others may need to adjust naturally.",
+      "Before we enter the operational side, we want to recognize what must stay at the center so that, even amid schedules and decisions, the celebration keeps feeling deeply yours.",
+    ],
+    paginas: [
+      [
+        {
+          id: "c5p1",
+          tipo: "pregunta",
+          titulo:
+            "If we could protect one single thing above all else during your wedding, what would it be?",
+          nota: [
+            "It could be your peace of mind, the ceremony, time with the people you love, enjoying every moment, or any intention that, for you, represents the heart of the day.",
+          ],
+        },
+        {
+          id: "c5p2",
+          tipo: "pregunta",
+          titulo:
+            "What would need to be present for you to look at your wedding and feel it truly represents you?",
+          nota: [
+            "Don't think only of visible elements. It could be an emotion, a way of being together, a tradition, or the way you want to feel side by side.",
+          ],
+        },
+      ],
+      [
+        {
+          id: "c5p3",
+          tipo: "pregunta",
+          titulo:
+            "Is there something you wouldn't want the pace of the wedding to keep you from enjoying?",
+          nota: [
+            "It could be sitting down to dinner, talking with certain people, taking in the finished space, dancing together, or simply pausing for a few minutes to take in what you're living.",
+          ],
+        },
+        {
+          id: "c5p4",
+          tipo: "pregunta",
+          titulo:
+            "If a small adjustment became necessary during the day, where would you feel you could be most flexible?",
+          nota: [
+            "We're not trying to anticipate problems, but to understand which elements could adapt without altering the essence of the celebration.",
+          ],
+        },
+      ],
+      [
+        {
+          id: "c5e1",
+          tipo: "frase",
+          lead: ["Complete the following sentence together:"],
+          titulo: "No matter what happens that day, we want to remember that…",
+          nota: [
+            "Think of what you'd like to keep in mind when the emotion, the timing, and all the moments of the wedding begin to unfold.",
+          ],
+        },
+      ],
+    ],
+  },
+  {
+    num: 6,
+    titulo: "Being Present",
+    frases: [
+      "After so many months building this day, the moment will come to stop organizing it and simply begin to live it.",
+    ],
+    intro: [
+      "Throughout the planning you've kept watch over decisions, conversations, and details that slowly gave shape to your wedding.",
+      "When the day finally arrives, we want to understand what you need in order to let go of that responsibility, trust everything you've built, and allow yourselves to be fully present.",
+    ],
+    paginas: [
+      [
+        {
+          id: "c6p1",
+          tipo: "pregunta",
+          titulo:
+            "When you say you want to enjoy your wedding, how do you imagine that will actually look?",
+          nota: [
+            "Perhaps it means talking without rushing, dancing without watching the clock, sitting down to dinner, embracing your important people, or simply pausing to take in everything that's happening.",
+          ],
+        },
+        {
+          id: "c6p2",
+          tipo: "pregunta",
+          titulo:
+            "After being so involved in the planning, is there a responsibility you feel might be hard to leave in other hands?",
+          nota: [
+            "We don't want you to step away from something you consider important. We want to recognize what you'll need to release with greater trust when the day comes.",
+          ],
+        },
+      ],
+      [
+        {
+          id: "c6p3",
+          tipo: "pregunta",
+          titulo:
+            "What would help you feel at ease during the hours before the wedding?",
+          nota: [
+            "It could be starting the day unhurried, being with certain people, having moments of quiet, or knowing there's no decision left to make.",
+          ],
+        },
+        {
+          id: "c6p4",
+          tipo: "pregunta",
+          titulo:
+            "If you need our attention during the celebration, how would you like us to approach you?",
+          nota: [
+            "Perhaps you'd rather only hear about what truly needs your decision, or feel accompanied in a close, discreet way. It will help us to know what makes you most comfortable.",
+          ],
+        },
+      ],
+      [
+        {
+          id: "c6p5",
+          tipo: "pregunta",
+          titulo:
+            "Is there something you'd like to stop carrying from the moment your wedding begins?",
+          nota: [
+            "It could be a worry, an expectation, the need to supervise, or any responsibility you want to leave behind so you can live the day fully.",
+          ],
+        },
+      ],
+      [
+        {
+          id: "c6e1",
+          tipo: "frase",
+          lead: ["Complete the following sentence together:"],
+          titulo: "On our wedding day, we give ourselves permission to…",
+          nota: [
+            "Think of what you want to allow yourselves to live after all the road you've traveled: to enjoy, to trust, to be moved, to pause, to celebrate, or simply to be together.",
+          ],
+        },
+      ],
+    ],
+  },
+];
+
+export const CONTENIDO_EN: ContenidoCuaderno = {
+  libro: {
+    titulo: "The First Chapter",
+    subtitulo: "Discovery Notebook",
+    servicio: "PAHTIĀ · Day-of Coordination",
+    marca: "Clhei Floral Styling & Events",
+    firma: "Tania Castorena",
+    slug: "pahtia",
+    etiqueta: "PAHTIĀ",
+  },
+  instrucciones: {
+    titulo: "Before you begin",
+    parrafos: [
+      "This notebook is meant to be answered together.",
+      "You don't need to finish it in one sitting or find perfect answers. You can pause, talk, remember everything you've built, and return to these pages whenever you like.",
+      "Answer it together. Take breaks, tell each other stories, and enjoy this chance to look at your wedding beyond to-dos and decisions.",
+    ],
+    notaDigital:
+      "Your answers save themselves as you write — a small “Saved” will appear above each time it happens. You can close this page and come back whenever you like: the notebook will be waiting right where you left it. Just keep in mind it lives in this browser; if you begin on the computer, continue there.",
+  },
+  cartaBienvenida: {
+    parrafos: [
+      "If this notebook has reached you, it means we're beginning a new stage on the road to your wedding.",
+      "Over the past months you've made decisions, chosen people, imagined moments, and slowly built a celebration that already has a story of its own. Now it's our turn to know it, understand it, and accompany you so that everything you've prepared can be lived with the calm it deserves.",
+      "Before we talk about schedules, vendors, or to-dos, we want to pause and get to know you.",
+      "We want to discover what is truly important to you, which moments you most want to protect, who is an essential part of this day, and how you hope to feel when it finally arrives.",
+      "These pages will let us see your wedding through your eyes and understand not only how it's organized, but why each decision holds its place within it.",
+      "Answer them together. Take breaks, tell each other stories, remember how it all began, and enjoy this chance to look again at the celebration you've built.",
+      "We'll return to these pages throughout the coordination whenever we need to remember what must remain at the heart of every decision.",
+      "Thank you for trusting us to receive your project, care for everything you've built, and accompany you through the final part of this road.",
+    ],
+    despedida: "With love,",
+  },
+  cartaCierre: {
+    titulo: "Now You Only Have to Live It",
+    parrafos: [
+      "If you've made it here, you've also reached a very special moment on the road.",
+      "Over the past months you imagined, chose, resolved, and built a celebration full of decisions that speak of you. In these pages you let us know everything behind that day: the people you love, the moments you await, the details you wish to care for, and the way you want to feel when it finally arrives.",
+      "From now on, a different stage begins.",
+      "Little by little we'll receive everything you've built, understand each decision, and prepare the way so that, when the wedding arrives, you no longer have to hold it up.",
+      "It won't be a time to check to-dos, anticipate what's next, or watch over every move.",
+      "It will be a time to trust.",
+      "To look around, embrace the people you love, let yourselves be surprised by everything you imagined, and allow yourselves to live the day without feeling you have to direct it.",
+      "We'll return to these pages whenever we need to remember what is truly important to you and what we must protect while it all unfolds.",
+      "Thank you for entrusting us with a celebration that already holds such an important part of your story.",
+      "Now all that remains is to accompany you so you can live it fully.",
+    ],
+    despedida: "With love,",
+  },
+  fraseFinal:
+    "Everything you built is about to become a day that, at last, you can simply live.",
+  capitulos: CAPITULOS_EN,
+  totalCampos: TOTAL_CAMPOS,
+};
